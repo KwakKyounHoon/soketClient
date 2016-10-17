@@ -7,8 +7,8 @@
     <dimen name="remote_dialog_padding_top">6dp</dimen>
     <dimen name="remote_dialog_padding_left">24dp</dimen>
     <dimen name="remote_dialog_padding_right">24dp</dimen>
-    <dimen name="remote_dialog_width">700dp</dimen>
-    <dimen name="remote_dialog_height">430dp</dimen>
+    <dimen name="remote_dialog_width">400dp</dimen>
+    <dimen name="remote_dialog_height">500dp</dimen>
     <dimen name="remote_dialog_text_size">20sp</dimen>
     <dimen name="remote_dialog_item_margin_top">16dp</dimen>
 </resources>

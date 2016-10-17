@@ -9,18 +9,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.obigo.tmutestapp.fragment.RemoteSettingFragment;
+
+import org.json.JSONObject;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RemoteSettingFragment.OnRemoteDailogListener {
     private EditText iPView, portView;
     private Socket socket;
     private DataOutputStream writeSocket;
     private DataInputStream readSocket;
     private Handler mHandler = new Handler();
 
-    int i = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,10 +51,17 @@ public class MainActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                (new sendMessage()).start();
+                RemoteSettingFragment f = new RemoteSettingFragment();
+                f.setOnRemoteDailogListener(MainActivity.this);
+                f.show(getSupportFragmentManager(), "remotestart");
             }
         });
 
+    }
+
+    @Override
+    public void onOkBtnClick(JSONObject settings) {
+        (new sendMessage(settings)).start();
     }
 
     class Connect extends Thread {
@@ -194,10 +204,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     class sendMessage extends Thread {
+        JSONObject jsonObject = null;
+        sendMessage(JSONObject jsonObject){
+            this.jsonObject = jsonObject;
+        }
         public void run() {
             try {
                 byte[] b = new byte[100];
-                b = (i+"").getBytes();
+                b = (jsonObject.toString()+"").getBytes();
                 writeSocket.write(b);
 
             } catch (Exception e) {
