@@ -1,0 +1,14 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- RemoteSetting -->
+    <dimen name="remote_dialog_padding_top">6dp</dimen>
+    <dimen name="remote_dialog_padding_left">24dp</dimen>
+    <dimen name="remote_dialog_padding_right">24dp</dimen>
+    <dimen name="remote_dialog_width">700dp</dimen>
+    <dimen name="remote_dialog_height">430dp</dimen>
+    <dimen name="remote_dialog_text_size">20sp</dimen>
+    <dimen name="remote_dialog_item_margin_top">16dp</dimen>
+</resources>
