@@ -10,13 +10,20 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.IO;
 import com.obigo.tmutestapp.fragment.RemoteSettingFragment;
+import com.obigo.tmutestapp.manager.NetworkManager;
+import com.obigo.tmutestapp.manager.NetworkRequest;
+import com.obigo.tmutestapp.request.RemoteStartRequest;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.net.URISyntaxException;
 
 public class MainActivity extends AppCompatActivity implements RemoteSettingFragment.OnRemoteDailogListener {
     private EditText iPView, portView;
@@ -40,10 +47,51 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
 
     private TextView recieveView;
 
+    private com.github.nkzawa.socketio.client.Socket mSocket;
+
+    private Emitter.Listener listen_start_person = new Emitter.Listener() {
+
+        public void call(Object... args) {
+            Log.i("test receive",args[0]+"");
+            //서버에서 보낸 JSON객체를 사용할 수 있습니다.
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                }
+            });
+        }
+    };
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        try {
+            mSocket = IO.socket("http://192.168.0.61:3000");
+        }
+        catch (URISyntaxException e) {
+            Log.v("AvisActivity", "error connecting to socket");
+        }
+
+        Log.v("AvisActivity", "try to connect");
+        mSocket.connect();
+        Log.v("AvisActivity", "connection sucessful");
+
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("image", "test");
+            mSocket.emit("chat message", obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        mSocket.on("chat message", listen_start_person);
+
         Utils.makeCelsiusTable();
         iPView = (EditText)findViewById(R.id.edit_ip);
         portView = (EditText)findViewById(R.id.edit_port);
@@ -145,11 +193,27 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
                 (new sendMessage("0",RESET_MAINTENANCE)).start();
             }
         });
+
+
     }
 
     @Override
     public void onOkBtnClick(JSONObject settings) {
-        (new sendMessage(settings.toString(),REMOTE_START)).start();
+//        (new sendMessage(settings.toString(),REMOTE_START)).start();
+//        NetworkManager.getInstance()
+        Log.i("test send",settings.toString());
+        RemoteStartRequest remoteStartRequest = new RemoteStartRequest("requestData="+settings.toString());
+        NetworkManager.getInstance().getNetworkData(remoteStartRequest, new NetworkManager.OnResultListener<String>() {
+            @Override
+            public void onSuccess(NetworkRequest<String> request, String result) {
+                Toast.makeText(MainActivity.this,"success",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFail(NetworkRequest<String> request, int errorCode, String errorMessage) {
+
+            }
+        });
     }
 
     class Connect extends Thread {
