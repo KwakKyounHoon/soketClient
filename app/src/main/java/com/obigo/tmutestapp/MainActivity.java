@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.obigo.tmutestapp.fragment.RemoteSettingFragment;
@@ -20,9 +21,24 @@ import java.net.Socket;
 public class MainActivity extends AppCompatActivity implements RemoteSettingFragment.OnRemoteDailogListener {
     private EditText iPView, portView;
     private Socket socket;
-    private DataOutputStream writeSocket;
-    private DataInputStream readSocket;
+    private DataOutputStream dos;
+    private DataInputStream dis;
     private Handler mHandler = new Handler();
+
+    private String GET_VEHICLE_STATUS = "0";
+    private String GET_VEHICLE_INFO = "1";
+    private String GET_DTCS = "2";
+    private String GET_VEHICLE_LOCATION = "3";
+    private String REMOTE_START = "4";
+    private String REMOTE_STOP = "5";
+    private String DOOR_LOCK = "6";
+    private String DOOR_UNLOCK = "7";
+    private String HORN = "8";
+    private String LIGHT = "9";
+    private String SET_CLIMATE = "10";
+    private String RESET_MAINTENANCE = "11";
+
+    private TextView recieveView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         Utils.makeCelsiusTable();
         iPView = (EditText)findViewById(R.id.edit_ip);
         portView = (EditText)findViewById(R.id.edit_port);
+        recieveView = (TextView)findViewById(R.id.text_recieve);
         Button btn = (Button)findViewById(R.id.btn_connect);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,11 +74,82 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
             }
         });
 
+        btn = (Button)findViewById(R.id.btn_get_vehicle_status);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                (new sendMessage("0",GET_VEHICLE_STATUS)).start();
+            }
+        });
+
+        btn = (Button)findViewById(R.id.btn_get_vehicle_info);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                (new sendMessage("0",GET_VEHICLE_INFO)).start();
+            }
+        });
+
+        btn = (Button)findViewById(R.id.btn_get_dtcs);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                (new sendMessage("0",GET_DTCS)).start();
+            }
+        });
+
+        btn = (Button)findViewById(R.id.btn_Remote_stop);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                (new sendMessage("0",REMOTE_STOP)).start();
+            }
+        });
+
+        btn = (Button)findViewById(R.id.btn_door_lock);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                (new sendMessage("0",DOOR_LOCK)).start();
+            }
+        });
+
+        btn = (Button)findViewById(R.id.btn_door_unlock);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                (new sendMessage("0",DOOR_UNLOCK)).start();
+            }
+        });
+
+        btn = (Button)findViewById(R.id.btn_hron);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                (new sendMessage("0",HORN)).start();
+            }
+        });
+
+        btn = (Button)findViewById(R.id.btn_Light);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                (new sendMessage("0",LIGHT)).start();
+            }
+        });
+
+        btn = (Button)findViewById(R.id.btn_reset_maintenance);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                (new sendMessage("0",RESET_MAINTENANCE)).start();
+            }
+        });
     }
 
     @Override
     public void onOkBtnClick(JSONObject settings) {
-        (new sendMessage(settings)).start();
+        (new sendMessage(settings.toString(),REMOTE_START)).start();
     }
 
     class Connect extends Thread {
@@ -87,8 +175,9 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
                 ip = iPView.getText().toString();
                 port = Integer.parseInt(portView.getText().toString());
                 socket = new Socket(ip, port);
-                writeSocket = new DataOutputStream(socket.getOutputStream());
-                readSocket = new DataInputStream(socket.getInputStream());
+                dos = new DataOutputStream(socket.getOutputStream());
+//                yourOutputStream = new DataOutputStream(socket.getOutputStream()); // OutputStream where to send the map in case of network you get it from the Socket instance.
+                dis = new DataInputStream(socket.getInputStream());
 
                 mHandler.post(new Runnable() {
 
@@ -112,21 +201,18 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
                     }
 
                 });
-
             }
-
         }
     }
 
     class recvSocket extends Thread {
-
         public void run() {
             try {
-                readSocket = new DataInputStream(socket.getInputStream());
+                dis = new DataInputStream(socket.getInputStream());
 
                 while (true) {
-                    byte[] b = new byte[100];
-                    int ac = readSocket.read(b, 0, b.length);
+                    byte[] b = new byte[1024];
+                    int ac = dis.read(b, 0, b.length);
                     String input = new String(b, 0, b.length);
                     final String recvInput = input.trim();
 
@@ -138,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
                         @Override
                         public void run() {
                             // TODO Auto-generated method stub
-                            setToast(recvInput);
+                            recieveView.setText(recvInput);
                         }
                     });
                 }
@@ -173,7 +259,10 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         public void run() {
             try {
                 if (socket != null) {
+                    dos.close();
+                    dis.close();
                     socket.close();
+                    socket = null;
                     mHandler.post(new Runnable() {
 
                         @Override
@@ -204,16 +293,15 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
     }
 
     class sendMessage extends Thread {
-        JSONObject jsonObject = null;
-        sendMessage(JSONObject jsonObject){
-            this.jsonObject = jsonObject;
+        String data = "";
+        sendMessage(String data, String category){
+            this.data = category+"/"+data;
         }
         public void run() {
             try {
-                byte[] b = new byte[100];
-                b = (jsonObject.toString()+"").getBytes();
-                writeSocket.write(b);
-
+                byte[] b = new byte[1024];
+                b = (data+"").getBytes();
+                dos.write(b);
             } catch (Exception e) {
                 final String recvInput = "메시지 전송에 실패하였습니다.";
                 Log.d("SetServer", e.getMessage());
@@ -227,6 +315,12 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
 
                 });
 
+//            }finally {
+//                try {
+//                    dos.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
             }
 
         }
