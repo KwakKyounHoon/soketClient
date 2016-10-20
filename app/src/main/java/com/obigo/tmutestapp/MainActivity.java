@@ -97,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
                         // TODO Auto-generated method stub
                         setToast("연결에 성공하였습니다.");
                     }
-
                 });
                 (new recvSocket()).start();
             } catch (Exception e) {
@@ -134,7 +133,6 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
                         break;
 
                     mHandler.post(new Runnable() {
-
                         @Override
                         public void run() {
                             // TODO Auto-generated method stub
@@ -143,7 +141,6 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
                     });
                 }
                 mHandler.post(new Runnable(){
-
                     @Override
                     public void run() {
                         // TODO Auto-generated method stub
@@ -182,7 +179,6 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
                             setToast("연결이 종료되었습니다.");
                         }
                     });
-
                 }
 
             } catch (Exception e) {
