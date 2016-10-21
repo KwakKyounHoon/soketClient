@@ -30,7 +30,7 @@ public class GetVehicleInfoRequest extends NetworkRequest<String> {
     @Override
     protected void setRequestProperty(HttpURLConnection conn) {
         super.setRequestProperty(conn);
-
+        conn.setRequestProperty("vehicleid","0001");
     }
 
     @Override
