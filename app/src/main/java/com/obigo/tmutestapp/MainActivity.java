@@ -10,11 +10,19 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.nkzawa.emitter.Emitter;
 import com.obigo.tmutestapp.fragment.RemoteSettingFragment;
 import com.obigo.tmutestapp.manager.NetworkManager;
 import com.obigo.tmutestapp.manager.NetworkRequest;
+import com.obigo.tmutestapp.request.DoorLockRequest;
+import com.obigo.tmutestapp.request.DoorUnlockRequest;
+import com.obigo.tmutestapp.request.GetVehicleDTCsRequest;
+import com.obigo.tmutestapp.request.GetVehicleInfoRequest;
+import com.obigo.tmutestapp.request.GetVehicleStatusRequest;
+import com.obigo.tmutestapp.request.HornRequest;
+import com.obigo.tmutestapp.request.LightRequest;
 import com.obigo.tmutestapp.request.RemoteStartRequest;
+import com.obigo.tmutestapp.request.RemoteStopRequest;
+import com.obigo.tmutestapp.request.ResetMaintenanceRequest;
 
 import org.json.JSONObject;
 
@@ -44,52 +52,11 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
 
     private TextView recieveView;
 
-    private com.github.nkzawa.socketio.client.Socket mSocket;
-
-    private Emitter.Listener listen_start_person = new Emitter.Listener() {
-
-        public void call(Object... args) {
-            for(int i = 0; i < args.length; i++){
-                Log.i("test receive222",args[i]+"");
-            }
-            //서버에서 보낸 JSON객체를 사용할 수 있습니다.
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                }
-            });
-        }
-    };
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-//        try {
-//            mSocket = IO.socket("http://218.147.65.20:3000");
-//        }
-//        catch (URISyntaxException e) {
-//            Log.v("AvisActivity", "error connecting to socket");
-//        }
-//
-//        Log.v("AvisActivity", "try to connect");
-//        mSocket.connect();
-//        Log.v("AvisActivity", "connection sucessful");
-//
-//        JSONObject obj = new JSONObject();
-//        try {
-//            obj.put("image", "test");
-//            mSocket.emit("chat message", obj);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        mSocket.on("server data", listen_start_person);
 
         Utils.makeCelsiusTable();
         iPView = (EditText)findViewById(R.id.edit_ip);
@@ -125,7 +92,19 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                (new sendMessage("0",GET_VEHICLE_STATUS)).start();
+                GetVehicleStatusRequest request = new GetVehicleStatusRequest();
+                NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
+                    @Override
+                    public void onSuccess(NetworkRequest<String> request, String result) {
+                        setToast(result);
+                        recieveView.setText(result);
+                    }
+
+                    @Override
+                    public void onFail(NetworkRequest<String> request, int errorCode, String errorMessage) {
+
+                    }
+                });
             }
         });
 
@@ -133,7 +112,19 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                (new sendMessage("0",GET_VEHICLE_INFO)).start();
+                GetVehicleInfoRequest request = new GetVehicleInfoRequest();
+                NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
+                    @Override
+                    public void onSuccess(NetworkRequest<String> request, String result) {
+                        setToast(result);
+                        recieveView.setText(result);
+                    }
+
+                    @Override
+                    public void onFail(NetworkRequest<String> request, int errorCode, String errorMessage) {
+
+                    }
+                });
             }
         });
 
@@ -141,7 +132,19 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                (new sendMessage("0",GET_DTCS)).start();
+                GetVehicleDTCsRequest request = new GetVehicleDTCsRequest();
+                NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
+                    @Override
+                    public void onSuccess(NetworkRequest<String> request, String result) {
+                        setToast(result);
+                        recieveView.setText(result);
+                    }
+
+                    @Override
+                    public void onFail(NetworkRequest<String> request, int errorCode, String errorMessage) {
+
+                    }
+                });
             }
         });
 
@@ -149,7 +152,18 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                (new sendMessage("0",REMOTE_STOP)).start();
+                RemoteStopRequest request = new RemoteStopRequest();
+                NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
+                    @Override
+                    public void onSuccess(NetworkRequest<String> request, String result) {
+                        setToast(result);
+                    }
+
+                    @Override
+                    public void onFail(NetworkRequest<String> request, int errorCode, String errorMessage) {
+
+                    }
+                });
             }
         });
 
@@ -157,7 +171,18 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                (new sendMessage("0",DOOR_LOCK)).start();
+                DoorLockRequest request = new DoorLockRequest();
+                NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
+                    @Override
+                    public void onSuccess(NetworkRequest<String> request, String result) {
+                        setToast(result);
+                    }
+
+                    @Override
+                    public void onFail(NetworkRequest<String> request, int errorCode, String errorMessage) {
+
+                    }
+                });
             }
         });
 
@@ -165,7 +190,18 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                (new sendMessage("0",DOOR_UNLOCK)).start();
+                DoorUnlockRequest request = new DoorUnlockRequest();
+                NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
+                    @Override
+                    public void onSuccess(NetworkRequest<String> request, String result) {
+                        setToast(result);
+                    }
+
+                    @Override
+                    public void onFail(NetworkRequest<String> request, int errorCode, String errorMessage) {
+
+                    }
+                });
             }
         });
 
@@ -173,7 +209,18 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                (new sendMessage("0",HORN)).start();
+                HornRequest request = new HornRequest();
+                NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
+                    @Override
+                    public void onSuccess(NetworkRequest<String> request, String result) {
+                        setToast(result);
+                    }
+
+                    @Override
+                    public void onFail(NetworkRequest<String> request, int errorCode, String errorMessage) {
+
+                    }
+                });
             }
         });
 
@@ -181,7 +228,18 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                (new sendMessage("0",LIGHT)).start();
+                LightRequest request = new LightRequest();
+                NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
+                    @Override
+                    public void onSuccess(NetworkRequest<String> request, String result) {
+                        setToast(result);
+                    }
+
+                    @Override
+                    public void onFail(NetworkRequest<String> request, int errorCode, String errorMessage) {
+
+                    }
+                });
             }
         });
 
@@ -189,7 +247,18 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                (new sendMessage("0",RESET_MAINTENANCE)).start();
+                ResetMaintenanceRequest request = new ResetMaintenanceRequest();
+                NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
+                    @Override
+                    public void onSuccess(NetworkRequest<String> request, String result) {
+                        setToast(result);
+                    }
+
+                    @Override
+                    public void onFail(NetworkRequest<String> request, int errorCode, String errorMessage) {
+
+                    }
+                });
             }
         });
 
@@ -198,8 +267,6 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
 
     @Override
     public void onOkBtnClick(JSONObject settings) {
-//        (new sendMessage(settings.toString(),REMOTE_START)).start();
-//        NetworkManager.getInstance()
 
         RemoteStartRequest remoteStartRequest = new RemoteStartRequest("requestData="+settings.toString());
         NetworkManager.getInstance().getNetworkData(remoteStartRequest, new NetworkManager.OnResultListener<String>() {
@@ -375,12 +442,6 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
 
                 });
 
-//            }finally {
-//                try {
-//                    dos.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
             }
 
         }

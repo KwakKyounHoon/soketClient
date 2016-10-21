@@ -6,20 +6,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Created by Administrator on 2016-08-08.
+ * Created by Kwak on 2016-10-20.
  */
-public class RemoteStartRequest extends NetworkRequest<String> {
-    private static final String DETAIL_URL = "http://192.168.0.61:3000/remotestart";
-    String body;
-    public RemoteStartRequest(String body) {
-        this.body = body;
-    }
+
+public class HornRequest extends NetworkRequest<String> {
+    private static final String DETAIL_URL = "http://192.168.0.61:3000/horn";
 
     @Override
     public URL getURL() throws MalformedURLException {
@@ -28,29 +24,13 @@ public class RemoteStartRequest extends NetworkRequest<String> {
 
     @Override
     protected String getRequestMethod() {
-        return POST;
+        return GET;
     }
 
     @Override
     protected void setRequestProperty(HttpURLConnection conn) {
         super.setRequestProperty(conn);
-//        conn.setRequestProperty("Accept", "application/json");
 
-        try {
-            conn.setDoInput(true);
-
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-
-            OutputStream os = conn.getOutputStream();
-
-            os.write( body.getBytes("euc-kr") );
-
-            os.flush();
-            os.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -74,3 +54,7 @@ public class RemoteStartRequest extends NetworkRequest<String> {
         return sb.toString();
     }
 }
+
+
+
+
