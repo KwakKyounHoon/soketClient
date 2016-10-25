@@ -31,7 +31,7 @@ import java.io.DataOutputStream;
 import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity implements RemoteSettingFragment.OnRemoteDailogListener {
-    private EditText iPView, portView;
+    private EditText iPView, portView, vinView;
     private Socket socket;
     private DataOutputStream dos;
     private DataInputStream dis;
@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         iPView = (EditText)findViewById(R.id.edit_ip);
         portView = (EditText)findViewById(R.id.edit_port);
         recieveView = (TextView)findViewById(R.id.text_recieve);
+        vinView = (EditText)findViewById(R.id.edit_vin);
         Button btn = (Button)findViewById(R.id.btn_connect);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,7 +93,8 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GetVehicleStatusRequest request = new GetVehicleStatusRequest();
+                String vehicleId = vinView.getText().toString();
+                GetVehicleStatusRequest request = new GetVehicleStatusRequest(vehicleId);
                 NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
                     @Override
                     public void onSuccess(NetworkRequest<String> request, String result) {
@@ -112,7 +114,8 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GetVehicleInfoRequest request = new GetVehicleInfoRequest();
+                String vehicleId = vinView.getText().toString();
+                GetVehicleInfoRequest request = new GetVehicleInfoRequest(vehicleId);
                 NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
                     @Override
                     public void onSuccess(NetworkRequest<String> request, String result) {
@@ -132,7 +135,8 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GetVehicleDTCsRequest request = new GetVehicleDTCsRequest();
+                String vehicleId = vinView.getText().toString();
+                GetVehicleDTCsRequest request = new GetVehicleDTCsRequest(vehicleId);
                 NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
                     @Override
                     public void onSuccess(NetworkRequest<String> request, String result) {
@@ -152,7 +156,8 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RemoteStopRequest request = new RemoteStopRequest();
+                String vehicleId = vinView.getText().toString();
+                RemoteStopRequest request = new RemoteStopRequest(vehicleId);
                 NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
                     @Override
                     public void onSuccess(NetworkRequest<String> request, String result) {
@@ -171,7 +176,8 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DoorLockRequest request = new DoorLockRequest();
+                String vehicleId = vinView.getText().toString();
+                DoorLockRequest request = new DoorLockRequest(vehicleId);
                 NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
                     @Override
                     public void onSuccess(NetworkRequest<String> request, String result) {
@@ -190,7 +196,8 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DoorUnlockRequest request = new DoorUnlockRequest();
+                String vehicleId = vinView.getText().toString();
+                DoorUnlockRequest request = new DoorUnlockRequest(vehicleId);
                 NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
                     @Override
                     public void onSuccess(NetworkRequest<String> request, String result) {
@@ -209,7 +216,8 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HornRequest request = new HornRequest();
+                String vehicleId = vinView.getText().toString();
+                HornRequest request = new HornRequest(vehicleId);
                 NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
                     @Override
                     public void onSuccess(NetworkRequest<String> request, String result) {
@@ -228,7 +236,8 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LightRequest request = new LightRequest();
+                String vehicleId = vinView.getText().toString();
+                LightRequest request = new LightRequest(vehicleId);
                 NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
                     @Override
                     public void onSuccess(NetworkRequest<String> request, String result) {
@@ -247,7 +256,8 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ResetMaintenanceRequest request = new ResetMaintenanceRequest();
+                String vehicleId = vinView.getText().toString();
+                ResetMaintenanceRequest request = new ResetMaintenanceRequest(vehicleId);
                 NetworkManager.getInstance().getNetworkData(request, new NetworkManager.OnResultListener<String>() {
                     @Override
                     public void onSuccess(NetworkRequest<String> request, String result) {
@@ -267,8 +277,8 @@ public class MainActivity extends AppCompatActivity implements RemoteSettingFrag
 
     @Override
     public void onOkBtnClick(JSONObject settings) {
-
-        RemoteStartRequest remoteStartRequest = new RemoteStartRequest("requestData="+settings.toString());
+        String vehicleId = vinView.getText().toString();
+        RemoteStartRequest remoteStartRequest = new RemoteStartRequest("requestData="+settings.toString(),vehicleId);
         NetworkManager.getInstance().getNetworkData(remoteStartRequest, new NetworkManager.OnResultListener<String>() {
             @Override
             public void onSuccess(NetworkRequest<String> request, String result) {

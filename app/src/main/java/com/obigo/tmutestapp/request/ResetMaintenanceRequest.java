@@ -17,6 +17,15 @@ import java.net.URL;
 public class ResetMaintenanceRequest extends NetworkRequest<String> {
     private static final String DETAIL_URL = "http://192.168.0.61:3000/reset";
 
+    String vehicleid = "";
+    public ResetMaintenanceRequest(String vehicleid){
+        this.vehicleid = vehicleid;
+    }
+
+    public ResetMaintenanceRequest(){
+
+    }
+
     @Override
     public URL getURL() throws MalformedURLException {
         return new URL(DETAIL_URL);
@@ -30,7 +39,7 @@ public class ResetMaintenanceRequest extends NetworkRequest<String> {
     @Override
     protected void setRequestProperty(HttpURLConnection conn) {
         super.setRequestProperty(conn);
-
+        conn.setRequestProperty("vehicleid",vehicleid);
     }
 
     @Override

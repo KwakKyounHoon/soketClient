@@ -17,8 +17,17 @@ import java.net.URL;
 public class RemoteStartRequest extends NetworkRequest<String> {
     private static final String DETAIL_URL = "http://192.168.0.61:3000/remotestart";
     String body;
-    public RemoteStartRequest(String body) {
+
+    String vehicleid = "";
+
+
+    public RemoteStartRequest(){
+
+    }
+
+    public RemoteStartRequest(String body, String vehicleid) {
         this.body = body;
+        this.vehicleid = vehicleid;
     }
 
     @Override
@@ -35,7 +44,7 @@ public class RemoteStartRequest extends NetworkRequest<String> {
     protected void setRequestProperty(HttpURLConnection conn) {
         super.setRequestProperty(conn);
 //        conn.setRequestProperty("Accept", "application/json");
-
+        conn.setRequestProperty("vehicleid",vehicleid);
         try {
             conn.setDoInput(true);
 

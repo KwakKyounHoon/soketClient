@@ -22,6 +22,15 @@ public class GetVehicleInfoRequest extends NetworkRequest<String> {
         return new URL(DETAIL_URL);
     }
 
+    String vehicleid = "";
+    public GetVehicleInfoRequest(String vehicleid){
+        this.vehicleid = vehicleid;
+    }
+
+    public GetVehicleInfoRequest(){
+
+    }
+
     @Override
     protected String getRequestMethod() {
         return GET;
@@ -30,7 +39,7 @@ public class GetVehicleInfoRequest extends NetworkRequest<String> {
     @Override
     protected void setRequestProperty(HttpURLConnection conn) {
         super.setRequestProperty(conn);
-        conn.setRequestProperty("vehicleid","0001");
+        conn.setRequestProperty("vehicleid",vehicleid);
     }
 
     @Override
